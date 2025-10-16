@@ -6,6 +6,7 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.world.DimensionType;
+import nl.grapjeje.nativechunks.NativeGenerator;
 
 public class Main {
     @Getter
@@ -20,6 +21,8 @@ public class Main {
         // Initialize instance
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         InstanceContainer instance = instanceManager.createInstanceContainer(DimensionType.OVERWORLD);
+
+        instance.setGenerator(new NativeGenerator());
 
         setInstanceContainer(instance);
 
