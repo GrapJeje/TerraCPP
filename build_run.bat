@@ -7,4 +7,3 @@ mkdir src\main\cpp\build 2>nul
 cd src\main\cpp\build
 cmake ..
 cmake --build .
-pause
