@@ -11,7 +11,7 @@ JNIEXPORT jbyteArray JNICALL Java_nl_grapjeje_nativechunks_NativeChunkGenerator_
 (JNIEnv* env, jobject, const jint chunkX, const jint chunkZ, const jlong seed) {
     constexpr int SIZE_X = 16;
     constexpr int SIZE_Z = 16;
-    constexpr int SIZE_Y = 256;
+    constexpr int SIZE_Y = 319;
     constexpr int TOTAL_SIZE = SIZE_X * SIZE_Z * SIZE_Y;
 
     std::vector<jbyte> blocks(TOTAL_SIZE, 0);
@@ -67,7 +67,7 @@ JNIEXPORT jbyteArray JNICALL Java_nl_grapjeje_nativechunks_NativeChunkGenerator_
     };
 
     constexpr int EDGE_MARGIN = 3;
-    constexpr int WATER_LEVEL = 63;
+    constexpr int WATER_LEVEL = 63 * 2;
 
     for (int x = 0; x < SIZE_X; ++x) {
         for (int z = 0; z < SIZE_Z; ++z) {
@@ -77,14 +77,16 @@ JNIEXPORT jbyteArray JNICALL Java_nl_grapjeje_nativechunks_NativeChunkGenerator_
             const double largeNoise = noise(worldX, worldZ, 0.02) * 2.0 - 1.0;
             const double smallNoise = noise(worldX + 1000, worldZ + 1000, 0.08) * 2.0 - 1.0;
 
-            int height = 64 + static_cast<int>(largeNoise * 6.0 + smallNoise * 2.0);
-            height = std::clamp(height, 56, 72);
+            int height = 64 * 2 + static_cast<int>(largeNoise * 6.0 + smallNoise * 2.0);
+            height = std::clamp(height, 56 * 2, 72 * 2);
 
             for (int y = 0; y < SIZE_Y; ++y) {
                 const int index = indexOf(x, y, z);
 
                 if (y == 0) {
                     blocks[index] = static_cast<jbyte>(Material::BEDROCK);
+                } else if (y < height - 63) {
+                    blocks[index] = static_cast<jbyte>(Material::DEEPSLATE);
                 } else if (y < height - 4) {
                     blocks[index] = static_cast<jbyte>(Material::STONE);
                 } else if (y < height - 1) {

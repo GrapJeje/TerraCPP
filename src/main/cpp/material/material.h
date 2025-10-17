@@ -14,7 +14,8 @@ enum class Material : std::uint8_t {
     OAK_LOG,
     OAK_LEAVES,
     SHORT_GRASS,
-    SEA_GRASS
+    SEA_GRASS,
+    DEEPSLATE,
 };
 
 #endif

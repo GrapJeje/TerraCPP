@@ -12,6 +12,8 @@ public class NativeGenerator implements Generator {
 
     @Override
     public void generate(@NotNull GenerationUnit unit) {
+        long startTime = System.nanoTime();
+
         int startX = unit.absoluteStart().blockX();
         int startY = unit.absoluteStart().blockY();
         int startZ = unit.absoluteStart().blockZ();
@@ -37,11 +39,15 @@ public class NativeGenerator implements Generator {
                         case 7 -> Block.OAK_LEAVES;
                         case 8 -> Block.SHORT_GRASS;
                         case 9 -> Block.SEAGRASS;
+                        case 10 -> Block.DEEPSLATE;
                         default -> Block.AIR;
                     };
                     if (block != Block.AIR) unit.modifier().setBlock(startX + x, startY + y, startZ + z, block);
                 }
             }
         }
+        long endTime = System.nanoTime();
+        double durationMs = (endTime - startTime) / 1_000_000.0;
+        System.out.println("Chunk generated at [" + startX/16 + "," + startZ/16 + "] in " + durationMs + " ms");
     }
 }
