@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public class NativeChunkGenerator {
     private static boolean loaded = false;
-    private long seed;
+    private final long seed;
 
     public NativeChunkGenerator(long seed) {
         this.seed = seed;
@@ -20,4 +20,5 @@ public class NativeChunkGenerator {
     }
 
     private native byte[] generateChunkNative(int chunkX, int chunkZ, long seed);
+    public static native String getMaterialName(byte id);
 }

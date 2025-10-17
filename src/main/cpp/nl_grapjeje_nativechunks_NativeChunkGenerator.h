@@ -15,6 +15,14 @@ extern "C" {
 JNIEXPORT jbyteArray JNICALL Java_nl_grapjeje_nativechunks_NativeChunkGenerator_generateChunkNative
   (JNIEnv *, jobject, jint, jint, jlong);
 
+/*
+ * Class:     nl_grapjeje_nativechunks_NativeChunkGenerator
+ * Method:    getMaterialName
+ * Signature: (B)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_nl_grapjeje_nativechunks_NativeChunkGenerator_getMaterialName
+  (JNIEnv *, jclass, jbyte);
+
 #ifdef __cplusplus
 }
 #endif

@@ -8,8 +8,6 @@ import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.world.DimensionType;
 import nl.grapjeje.nativechunks.NativeGenerator;
 
-import java.util.Random;
-
 public class Main {
     @Getter
     @Setter

@@ -7,8 +7,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(JNI REQUIRED)
 include_directories(${JNI_INCLUDE_DIRS})
 
-add_library(nativechunks SHARED nativechunks.cpp)
+add_library(Nativechunks SHARED Nativechunks.cpp
+        worldParts/tree/Tree.cpp
+        worldParts/tree/TreeFactory.cpp
+        worldParts/tree/types/OakTree.h
+        worldParts/tree/types/OakTree.cpp)
 
-set_target_properties(nativechunks PROPERTIES
+set_target_properties(Nativechunks PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build
 )

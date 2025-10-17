@@ -95,9 +95,12 @@
         <configuration>
           <mainClass>nl.grapjeje.Main</mainClass>
           <workingDirectory>${project.basedir}</workingDirectory>
-          <systemPropertyVariables>
-            <java.library.path>${project.basedir}/src/main/cpp/build</java.library.path>
-          </systemPropertyVariables>
+          <systemProperties>
+            <systemProperty>
+              <key>java.library.path</key>
+              <value>${project.basedir}/src/main/cpp/build</value>
+            </systemProperty>
+          </systemProperties>
         </configuration>
       </plugin>
     </plugins>
