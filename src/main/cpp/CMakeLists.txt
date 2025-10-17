@@ -11,7 +11,9 @@ add_library(Nativechunks SHARED Nativechunks.cpp
         worldParts/tree/Tree.cpp
         worldParts/tree/TreeFactory.cpp
         worldParts/tree/types/OakTree.h
-        worldParts/tree/types/OakTree.cpp)
+        worldParts/tree/types/OakTree.cpp
+        worldParts/tree/types/MediumOakTree.cpp
+        worldParts/tree/types/MediumOakTree.h)
 
 set_target_properties(Nativechunks PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build
