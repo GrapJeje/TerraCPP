@@ -1,4 +1,5 @@
 #include "Tree.h"
+#include "../../material/material.h"
 
 void Tree::placeBlock(std::vector<jbyte>& blocks,
                       int x, int y, int z, jbyte id,
@@ -21,7 +22,7 @@ bool Tree::isTreeNearby(const std::vector<jbyte>& blocks,
             if (nx < 0 || nx >= sizeX || nz < 0 || nz >= sizeZ)
                 continue;
             for (int y = 0; y < sizeY; ++y) {
-                if (blocks[indexOf(nx, y, nz, sizeX, sizeZ)] == 17)
+                if (blocks[indexOf(nx, y, nz, sizeX, sizeZ)] == static_cast<jbyte>(Material::OAK_LOG))
                     return true;
             }
         }

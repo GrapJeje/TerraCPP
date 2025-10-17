@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <random>
 
+#include "../../../material/material.h"
+
 void MediumOakTree::generate(std::vector<jbyte> &blocks,
     int x, int y, int z,
     int sizeX, int sizeY, int sizeZ) const {
@@ -25,7 +27,7 @@ void MediumOakTree::generate(std::vector<jbyte> &blocks,
     std::uniform_int_distribution<> dist(3, 5);
     int height = dist(gen);
     for (int i = 0; i < height; ++i) {
-        treeMap[{x, y + i, z}] = 17;
+        treeMap[{x, y + i, z}] = static_cast<jbyte>(Material::OAK_LOG);
     }
     const int top = height + y;
 
@@ -37,24 +39,24 @@ void MediumOakTree::generate(std::vector<jbyte> &blocks,
                 if (std::abs(dx) == 2 && std::abs(dz) == 2) continue;
 
                 std::tuple<int,int,int> pos = {x + dx, y, z + dz};
-                if (treeMap.count(pos) && treeMap[pos] == 17) continue;
-                treeMap[pos] = 18;
+                if (treeMap.count(pos) && treeMap[pos] == static_cast<jbyte>(Material::OAK_LOG)) continue;
+                treeMap[pos] = static_cast<jbyte>(Material::OAK_LEAVES);
             }
         }
     }
 
-    treeMap[{x, top + 1, z}] = 18;
-    treeMap[{x + 1, top + 1, z}] = 18;
-    treeMap[{x - 1, top + 1, z}] = 18;
-    treeMap[{x, top + 1, z + 1}] = 18;
-    treeMap[{x, top + 1, z - 1}] = 18;
+    treeMap[{x, top + 1, z}] = static_cast<jbyte>(Material::OAK_LEAVES);
+    treeMap[{x + 1, top + 1, z}] = static_cast<jbyte>(Material::OAK_LEAVES);
+    treeMap[{x - 1, top + 1, z}] = static_cast<jbyte>(Material::OAK_LEAVES);
+    treeMap[{x, top + 1, z + 1}] = static_cast<jbyte>(Material::OAK_LEAVES);
+    treeMap[{x, top + 1, z - 1}] = static_cast<jbyte>(Material::OAK_LEAVES);
 
     for (const auto& [coord, blockId] : treeMap) {
         auto [bx, by, bz] = coord;
         if (bx < 0 || bx >= sizeX || bz < 0 || bz >= sizeZ || by < 0 || by >= sizeY)
             continue;
 
-        if (int idx = indexOf(bx, by, bz, sizeX, sizeZ); blocks[idx] != 17)
+        if (int idx = indexOf(bx, by, bz, sizeX, sizeZ); blocks[idx] != static_cast<jbyte>(Material::OAK_LOG))
             blocks[idx] = blockId;
     }
 }

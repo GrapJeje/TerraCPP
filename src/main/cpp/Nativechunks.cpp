@@ -4,6 +4,7 @@
 #include <cmath>
 #include <algorithm>
 
+#include "material/material.h"
 #include "worldParts/tree/TreeFactory.h"
 
 JNIEXPORT jbyteArray JNICALL Java_nl_grapjeje_nativechunks_NativeChunkGenerator_generateChunkNative
@@ -83,17 +84,30 @@ JNIEXPORT jbyteArray JNICALL Java_nl_grapjeje_nativechunks_NativeChunkGenerator_
                 const int index = indexOf(x, y, z);
 
                 if (y == 0) {
-                    blocks[index] = 7;
+                    blocks[index] = static_cast<jbyte>(Material::BEDROCK);
                 } else if (y < height - 4) {
-                    blocks[index] = 1;
+                    blocks[index] = static_cast<jbyte>(Material::STONE);
                 } else if (y < height - 1) {
-                    blocks[index] = 3;
+                    blocks[index] = static_cast<jbyte>(Material::DIRT);
                 } else if (y == height - 1 && height > WATER_LEVEL) {
-                    blocks[index] = 2;
+                    blocks[index] = static_cast<jbyte>(Material::GRASS_BLOCK);
+                    if ((rand() % 100) < 30) {
+                        int aboveIndex = index + SIZE_X * SIZE_Z;
+                        if (aboveIndex < TOTAL_SIZE)
+                            blocks[aboveIndex] = static_cast<jbyte>(Material::SHORT_GRASS);
+                    }
                 } else if (y == height - 1 && height <= WATER_LEVEL) {
-                    blocks[index] = 3;
+                    blocks[index] = static_cast<jbyte>(Material::DIRT);
+                    for (int wY = y + 1; wY <= WATER_LEVEL; wY++) {
+                        int waterIndex = indexOf(x, wY, z);
+                        blocks[waterIndex] = static_cast<jbyte>(Material::WATER);
+                    }
+                    if ((rand() % 100) < 30) {
+                        int seagrassIndex = indexOf(x, y + 1, z);
+                        blocks[seagrassIndex] = static_cast<jbyte>(Material::SEA_GRASS);
+                    }
                 } else if (y >= height && y <= WATER_LEVEL) {
-                    blocks[index] = 9;
+                    blocks[index] = static_cast<jbyte>(Material::WATER);
                 }
             }
 
