@@ -3,7 +3,7 @@
 
 class OakTree : public Tree {
 public:
-    OakTree() : Tree(0.9) {}
+    OakTree() : Tree(0.8) {}
 
     void generate(std::vector<jbyte>& blocks,
                   int x, int y, int z,

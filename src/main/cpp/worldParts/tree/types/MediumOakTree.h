@@ -5,7 +5,7 @@
 
 class MediumOakTree : public Tree {
 public:
-    MediumOakTree() : Tree(0.01) {}
+    MediumOakTree() : Tree(0.1) {}
 
     void generate(std::vector<jbyte>& blocks,
                   int x, int y, int z,
