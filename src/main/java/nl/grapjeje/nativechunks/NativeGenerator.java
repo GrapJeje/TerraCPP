@@ -19,7 +19,6 @@ public class NativeGenerator implements Generator {
         int SIZE_Z = 16;
         int SIZE_Y = 256;
         int index = 0;
-
         for (int y = 0; y < SIZE_Y; y++) {
             for (int z = 0; z < SIZE_Z; z++) {
                 for (int x = 0; x < SIZE_X; x++) {
@@ -30,12 +29,13 @@ public class NativeGenerator implements Generator {
                         case 3 -> Block.DIRT;
                         case 7 -> Block.BEDROCK;
                         case 9 -> Block.WATER;
+                        case 17 -> Block.OAK_LOG;
+                        case 18 -> Block.OAK_LEAVES;
                         default -> Block.AIR;
                     };
 
-                    if (block != Block.AIR) {
+                    if (block != Block.AIR)
                         unit.modifier().setBlock(startX + x, startY + y, startZ + z, block);
-                    }
                 }
             }
         }

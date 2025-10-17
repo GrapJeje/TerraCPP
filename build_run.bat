@@ -1,4 +1,5 @@
 @echo off
+cls
 echo Compiling Java and generating JNI header...
 javac -h src\main\cpp src\main\java\nl\grapjeje\nativechunks\NativeChunkGenerator.java
 

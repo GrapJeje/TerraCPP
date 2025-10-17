@@ -2,6 +2,9 @@
 #include <jni.h>
 #include <vector>
 #include <cmath>
+#include <random>
+#include <map>
+#include <tuple>
 
 JNIEXPORT jbyteArray JNICALL Java_nl_grapjeje_nativechunks_NativeChunkGenerator_generateChunkNative
   (JNIEnv* env, jobject, jint chunkX, jint chunkZ) {
@@ -13,6 +16,10 @@ JNIEXPORT jbyteArray JNICALL Java_nl_grapjeje_nativechunks_NativeChunkGenerator_
     const int WATER_LEVEL = 63;
 
     std::vector<jbyte> blocks(TOTAL_SIZE, 0);
+
+    auto indexOf = [&](int x, int y, int z) -> int {
+        return x + z * SIZE_X + y * SIZE_X * SIZE_Z;
+    };
 
     auto hash = [](int x, int z) -> double {
         long n = x * 374761393L + z * 668265263L;
@@ -43,6 +50,86 @@ JNIEXPORT jbyteArray JNICALL Java_nl_grapjeje_nativechunks_NativeChunkGenerator_
         return v0 * (1 - fz) + v1 * fz;
     };
 
+    auto spawnTree = [&](int startX, int startY, int startZ) {
+        struct CoordCompare {
+            bool operator()(const std::tuple<int,int,int>& a, const std::tuple<int,int,int>& b) const {
+                if (std::get<0>(a) != std::get<0>(b)) return std::get<0>(a) < std::get<0>(b);
+                if (std::get<1>(a) != std::get<1>(b)) return std::get<1>(a) < std::get<1>(b);
+                return std::get<2>(a) < std::get<2>(b);
+            }
+        };
+        using Coord = std::tuple<int,int,int>;
+
+        std::map<Coord, jbyte, CoordCompare> treeMap;
+        treeMap[{startX, startY -1, startZ}] = 3;
+
+        treeMap[{startX, startY, startZ}] = 17;
+        treeMap[{startX, startY + 1, startZ}] = 17;
+        treeMap[{startX, startY + 2, startZ}] = 17;
+        treeMap[{startX, startY + 3, startZ}] = 17;
+        treeMap[{startX, startY + 4, startZ}] = 17;
+        treeMap[{startX, startY + 5, startZ}] = 17;
+
+        for (int dx = -2; dx <= 2; ++dx) {
+            for (int dz = -2; dz <= 2; ++dz) {
+                if (dx == 0 && dz == 0) continue;
+                treeMap[{startX + dx, startY + 3, startZ + dz}] = 18; 
+                if (dx == -2 && dz == -2) continue; 
+                treeMap[{startX + dx, startY + 4, startZ + dz}] = 18; 
+            }
+        }
+
+        treeMap[{startX + 1, startY + 5, startZ}] = 18;
+        treeMap[{startX - 1, startY + 5, startZ}] = 18;
+        treeMap[{startX, startY + 5, startZ - 1}] = 18;
+        treeMap[{startX, startY + 5, startZ + 1}] = 18;
+        treeMap[{startX + 1, startY + 5, startZ - 1}] = 18;
+
+        treeMap[{startX, startY + 6, startZ}] = 18;
+        treeMap[{startX + 1, startY + 6, startZ}] = 18;
+        treeMap[{startX - 1, startY + 6, startZ}] = 18;
+        treeMap[{startX, startY + 6, startZ - 1}] = 18;
+        treeMap[{startX, startY + 6, startZ + 1}] = 18;
+
+        for (const auto& [coord, blockId] : treeMap) {
+            auto [x, y, z] = coord;
+            if (x < 0 || x >= SIZE_X || z < 0 || z >= SIZE_Z || y < 0 || y >= SIZE_Y)
+                continue;
+            int idx = indexOf(x, y, z);
+            if (blocks[idx] == 17) continue;
+            blocks[idx] = blockId;
+        }
+    };
+
+    auto isTreeNearby = [&](int x, int z) -> bool {
+        for (int dx = -3; dx <= 3; ++dx) {
+            for (int dz = -3; dz <= 3; ++dz) {
+                int nx = x + dx;
+                int nz = z + dz;
+                if (nx < 0 || nx >= SIZE_X || nz < 0 || nz >= SIZE_Z)
+                    continue;
+
+                for (int y = 0; y < SIZE_Y; ++y) {
+                    if (blocks[indexOf(nx, y, nz)] == 17)
+                        return true;
+                }
+            }
+        }
+        return false;
+    };
+
+    auto treeChance = [&](int x, int y, int z) {
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        std::uniform_int_distribution<> distr(0, 99);
+        int randomPercent = distr(gen);
+        if (randomPercent < 1) {
+            if (x >= 2 && x < SIZE_X - 2 && z >= 2 && z < SIZE_Z - 2)
+                if (!isTreeNearby(x, z))
+                    spawnTree(x, y + 1, z);
+        }
+    };
+
     for (int x = 0; x < SIZE_X; ++x) {
         for (int z = 0; z < SIZE_Z; ++z) {
             int worldX = chunkX * SIZE_X + x;
@@ -55,7 +142,7 @@ JNIEXPORT jbyteArray JNICALL Java_nl_grapjeje_nativechunks_NativeChunkGenerator_
             height = std::max(56, std::min(72, height));
 
             for (int y = 0; y < SIZE_Y; ++y) {
-                int index = x + z * SIZE_X + y * SIZE_X * SIZE_Z;
+                int index = indexOf(x, y, z);
                 
                 if (y == 0) {
                     blocks[index] = 7;
@@ -68,9 +155,12 @@ JNIEXPORT jbyteArray JNICALL Java_nl_grapjeje_nativechunks_NativeChunkGenerator_
                 } else if (y == height - 1 && height <= WATER_LEVEL) {
                     blocks[index] = 3;
                 } else if (y >= height && y <= WATER_LEVEL) {
-                    blocks[index] = 9
+                    blocks[index] = 9;
                 }
             }
+
+            if (height > WATER_LEVEL)
+                treeChance(x, height - 1, z);
         }
     }
 
