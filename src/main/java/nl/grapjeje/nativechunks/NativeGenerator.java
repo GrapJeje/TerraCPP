@@ -5,8 +5,10 @@ import net.minestom.server.instance.generator.GenerationUnit;
 import net.minestom.server.instance.generator.Generator;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Random;
+
 public class NativeGenerator implements Generator {
-    private final NativeChunkGenerator nativeGen = new NativeChunkGenerator();
+    private final NativeChunkGenerator nativeGen = new NativeChunkGenerator(new Random().nextLong());
 
     @Override
     public void generate(@NotNull GenerationUnit unit) {

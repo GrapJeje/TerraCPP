@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     nl_grapjeje_nativechunks_NativeChunkGenerator
  * Method:    generateChunkNative
- * Signature: (II)[B
+ * Signature: (IIJ)[B
  */
 JNIEXPORT jbyteArray JNICALL Java_nl_grapjeje_nativechunks_NativeChunkGenerator_generateChunkNative
-  (JNIEnv *, jobject, jint, jint);
+  (JNIEnv *, jobject, jint, jint, jlong);
 
 #ifdef __cplusplus
 }

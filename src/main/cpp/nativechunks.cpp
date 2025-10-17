@@ -2,12 +2,11 @@
 #include <jni.h>
 #include <vector>
 #include <cmath>
-#include <random>
 #include <map>
 #include <tuple>
 
 JNIEXPORT jbyteArray JNICALL Java_nl_grapjeje_nativechunks_NativeChunkGenerator_generateChunkNative
-  (JNIEnv* env, jobject, jint chunkX, jint chunkZ) {
+  (JNIEnv* env, jobject, jint chunkX, jint chunkZ, jlong seed) {
 
     const int SIZE_X = 16;
     const int SIZE_Z = 16;
@@ -21,8 +20,8 @@ JNIEXPORT jbyteArray JNICALL Java_nl_grapjeje_nativechunks_NativeChunkGenerator_
         return x + z * SIZE_X + y * SIZE_X * SIZE_Z;
     };
 
-    auto hash = [](int x, int z) -> double {
-        long n = x * 374761393L + z * 668265263L;
+    auto hash = [&](int x, int z) -> double {
+        long n = seed + x * 374761393L + z * 668265263L;
         n = (n ^ (n >> 13)) * 1274126177L;
         return ((n ^ (n >> 16)) & 0x7fffffff) / (double)0x7fffffff;
     };
@@ -118,12 +117,13 @@ JNIEXPORT jbyteArray JNICALL Java_nl_grapjeje_nativechunks_NativeChunkGenerator_
         return false;
     };
 
-    auto treeChance = [&](int x, int y, int z) {
-        static std::random_device rd;
-        static std::mt19937 gen(rd());
-        std::uniform_int_distribution<> distr(0, 99);
-        int randomPercent = distr(gen);
-        if (randomPercent < 1) {
+    auto treeChance = [&](int worldX, int worldZ, int x, int y, int z) {
+        long posHash = seed + worldX * 341873128712L + worldZ * 132897987541L;
+        posHash = (posHash ^ (posHash >> 13)) * 1274126177L;
+        posHash = (posHash ^ (posHash >> 16));
+        int randomValue = (int)(posHash & 0x7fffffff) % 100;
+        
+        if (randomValue < 1) {
             if (x >= 2 && x < SIZE_X - 2 && z >= 2 && z < SIZE_Z - 2)
                 if (!isTreeNearby(x, z))
                     spawnTree(x, y + 1, z);
@@ -160,7 +160,7 @@ JNIEXPORT jbyteArray JNICALL Java_nl_grapjeje_nativechunks_NativeChunkGenerator_
             }
 
             if (height > WATER_LEVEL)
-                treeChance(x, height - 1, z);
+                treeChance(worldX, worldZ, x, height - 1, z);
         }
     }
 
