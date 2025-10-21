@@ -74,11 +74,23 @@ JNIEXPORT jbyteArray JNICALL Java_nl_grapjeje_nativechunks_NativeChunkGenerator_
             const int worldX = chunkX * SIZE_X + x;
             const int worldZ = chunkZ * SIZE_Z + z;
 
-            const double largeNoise = noise(worldX, worldZ, 0.02) * 2.0 - 1.0;
-            const double smallNoise = noise(worldX + 1000, worldZ + 1000, 0.08) * 2.0 - 1.0;
+            const double biomeNoise = noise(worldX, worldZ, 0.008);
+            const double baseNoise = noise(worldX, worldZ, 0.02) * 2.0 - 1.0;
+            const double detailNoise = noise(worldX + 1000, worldZ + 1000, 0.08) * 2.0 - 1.0;
 
-            int height = 64 * 2 + static_cast<int>(largeNoise * 6.0 + smallNoise * 2.0);
-            height = std::clamp(height, 56 * 2, 72 * 2);
+            double biomeFactor = std::clamp((biomeNoise - 0.45) / 0.2, 0.0, 1.0);
+            biomeFactor = biomeFactor * biomeFactor * (3.0 - 2.0 * biomeFactor);
+
+            // plains
+            int plainsHeight = 64 * 2 + static_cast<int>(baseNoise * 3.0 + detailNoise * 2.0);
+            plainsHeight = std::clamp(plainsHeight, 62 * 2, 68 * 2);
+
+            // forest
+            double hillNoise = noise(worldX + 2000, worldZ + 2000, 0.04) * 2.0 - 1.0;
+            int hillsHeight = 70 * 2 + static_cast<int>(baseNoise * 15.0 + hillNoise * 10.0 + detailNoise * 3.0);
+            hillsHeight = std::clamp(hillsHeight, 64 * 2, 90 * 2);
+
+            int height = static_cast<int>(plainsHeight * (1.0 - biomeFactor) + hillsHeight * biomeFactor);
 
             for (int y = 0; y < SIZE_Y; ++y) {
                 const int index = indexOf(x, y, z);
